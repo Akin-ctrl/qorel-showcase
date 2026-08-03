@@ -1,6 +1,6 @@
 # Qorel
 
-Qorel is an in-progress industrial data gateway for moving OT data into
+Qorel is an in-progress industrial data platform for moving OT data into
 modern data systems without treating the edge as an afterthought.
 
 > This is a public showcase repo. The full codebase is private while the
@@ -27,27 +27,27 @@ remaining understandable to people working close to the equipment.
 
 ## Screenshots
 
-**Overview** — platform health, control-plane status, active alarms, and live adapter/gateway/sink throughput.
+**Overview**, platform health, control-plane status, active alarms, and live adapter/gateway/sink throughput.
 ![Overview dashboard](screenshots/overview.jpeg)
 
-**Topology** — the lane-based dataflow view, from PLCs through adapters and gateway processing to Kafka-compatible topics and consumers.
+**Topology**, the lane-based dataflow view, from PLCs through adapters and gateway processing to Kafka-compatible topics and consumers.
 ![Topology](screenshots/topology.jpeg)
 
-**Alarms** — the incident response queue, with severity/state filtering and a detail drawer for value, threshold, and escalation status.
+**Alarms**, the incident response queue, with severity/state filtering and a detail drawer for value, threshold, and escalation status.
 ![Alarms](screenshots/alarms.jpeg)
 
-**Gateways** — enrollment token issuance and the gateway inventory (status, approval, active deployment, adapters/sinks, last seen).
+**Gateways**, enrollment token issuance and the gateway inventory (status, approval, active deployment, adapters/sinks, last seen).
 ![Gateways](screenshots/gateways.jpeg)
 
-**Adapters** — protocol-aware configuration, including ISA-95 physical hierarchy tagging.
+**Adapters**, protocol-aware configuration, including ISA-95 physical hierarchy tagging.
 ![Create adapter](screenshots/create-adapter.jpeg)
 ![Adapters list](screenshots/adapters.jpeg)
 
-**Sinks** — egress destinations with live throughput, latency, and error rate.
+**Sinks**, egress destinations with live throughput, latency, and error rate.
 ![Sinks list](screenshots/sinks.jpeg)
 ![Create sink](screenshots/create-sink.jpeg)
 
-**Alerting Rules** — threshold-based rules with operator messages and escalation behavior.
+**Alerting Rules**, threshold-based rules with operator messages and escalation behavior.
 ![Alerting rules](screenshots/alerting-rules.jpeg)
 
 ## Architecture At A Glance
@@ -89,7 +89,7 @@ their last known good configuration.
 **3. Industrial Data Needs Semantics**
 Qorel separates data into telemetry (continuous measurements), events (discrete
 state changes), alarms (lifecycle-aware abnormal conditions), and logs
-(operational/runtime messages) — instead of one undifferentiated stream of
+(operational/runtime messages), instead of one undifferentiated stream of
 industrial noise.
 
 **4. Operator Trust Matters**
@@ -154,6 +154,20 @@ gates.
 **Later:** additional industrial adapters and sink destinations, deeper
 production observability, optional enterprise auth UX, AI/copilot features
 once the core platform is trustworthy enough to support them.
+
+## Documentation
+
+- [Technical Walkthrough](docs/QOREL_TECHNICAL_OVERVIEW.md), a concrete walk
+  through a deployment, the engineering underneath it, protocol depth, the
+  operator experience, and what's shipped today
+- [Architecture](docs/ARCHITECTURE.md)
+- [Data Flow](docs/DATA_FLOW.md)
+- [Security](docs/SECURITY.md)
+- [Architecture Decision Records](docs/adr/), 15 ADRs covering edge
+  buffering, protocol adapters, schema management, validation/DLQ, sinks,
+  gateway autonomy, authentication, failure modes, overflow handling, the
+  copilot/MCP direction, alerting rules, escalation policies, alarm
+  lifecycle, and historian placement
 
 ## License
 
