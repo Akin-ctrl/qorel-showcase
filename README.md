@@ -122,7 +122,8 @@ Implemented today:
 
 Still in progress:
 
-- registry-publish and Kubernetes image-pull-secret templates
+- Kubernetes image-pull-secret templates (registry-publish itself, the
+  Makefile build/push/cross-build flow to a container registry, already ships)
 - fresh-stack and failure-path verification gates before AI work begins
 - responsive and readability hardening across the operator UI
 
@@ -146,8 +147,8 @@ aggregates, fleet, logs, alarms, DLQ, alerting rules and escalation policies,
 RBAC, audit trail, gateway enrollment/approval/revocation, edge historian,
 topology view, production compose packaging.
 
-**Active production-readiness work:** registry-publish and Kubernetes
-image-pull-secret templates, self-healing verification against a live stack,
+**Active production-readiness work:** Kubernetes image-pull-secret templates
+(registry-publish itself already ships), self-healing verification against a live stack,
 responsive/readability hardening, fresh-stack and failure-path verification
 gates.
 
