@@ -27,14 +27,28 @@ remaining understandable to people working close to the equipment.
 
 ## Screenshots
 
-<!--
-Add UI screenshots below, e.g.:
-![Fleet dashboard](screenshots/fleet.png)
-![Gateway topology](screenshots/topology.png)
-![Alerting rules](screenshots/alerting.png)
--->
+**Overview** — platform health, control-plane status, active alarms, and live adapter/gateway/sink throughput.
+![Overview dashboard](screenshots/overview.jpeg)
 
-_Screenshots coming soon._
+**Topology** — the lane-based dataflow view, from PLCs through adapters and gateway processing to Kafka-compatible topics and consumers.
+![Topology](screenshots/topology.jpeg)
+
+**Alarms** — the incident response queue, with severity/state filtering and a detail drawer for value, threshold, and escalation status.
+![Alarms](screenshots/alarms.jpeg)
+
+**Gateways** — enrollment token issuance and the gateway inventory (status, approval, active deployment, adapters/sinks, last seen).
+![Gateways](screenshots/gateways.jpeg)
+
+**Adapters** — protocol-aware configuration, including ISA-95 physical hierarchy tagging.
+![Create adapter](screenshots/create-adapter.jpeg)
+![Adapters list](screenshots/adapters.jpeg)
+
+**Sinks** — egress destinations with live throughput, latency, and error rate.
+![Sinks list](screenshots/sinks.jpeg)
+![Create sink](screenshots/create-sink.jpeg)
+
+**Alerting Rules** — threshold-based rules with operator messages and escalation behavior.
+![Alerting rules](screenshots/alerting-rules.jpeg)
 
 ## Architecture At A Glance
 
