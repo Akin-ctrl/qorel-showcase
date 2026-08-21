@@ -75,7 +75,7 @@ Deployment validation rules cover range, rate-of-change, gap-detection, and
 - **Range / rate-of-change / gap-detection breaches**: the validator detects
   these and writes a DLQ entry (`reason` describing the breach) as before,
   **and now also mirrors the same breach into the alarms table**
-  (`ValidatorModule._process_validation_breach_alarm`, `validator.py`),
+  (`ValidatorModule._process_validation_breach_alarm`, `validator.py`), 
   closing the gap tracked as remediation ledger item B6. `alarm_type` is
   `range_exceeded` (severity `HIGH`), `rate_of_change` (`MEDIUM`), or
   `gap_detected` (`LOW`); the alarm is keyed by `(asset_id, parameter,
@@ -108,7 +108,7 @@ evaluator:
    the shipped model instead makes `alarm_type` a unique, operator-defined
    string set when the rule is created. Path 1 (alarm-rules sub-path) and
    Path 2 alarms are therefore **not** distinguishable by a fixed
-   `alarm_type` pattern, they share one evaluation mechanism and one free-
+   `alarm_type` pattern; they share one evaluation mechanism and one free-
    text identifier space.
 
 This path is **operational today**.
@@ -121,7 +121,7 @@ The `alert_router` sink (ADR-005) is the delivery mechanism for alarm notificati
 2. Gateway runtime publishes each new `Alarm` record to `alarms.raw`, carrying the alarm-rule's `escalation_policy_id` if one is bound (`gateway_runtime/validator.py`, `_alarm_payload`)
 3. If `escalation_policy_id` is present, alert_router calls the gateway-authenticated `GET /api/v1/escalation-policies/{policy_id}/resolve` endpoint (includes `channel_url`, which is never exposed to user-session-authenticated routes, see ADR-013)
 4. alert_router walks the resolved policy steps in array order: `step_type: immediate` delivers right away; `step_type: escalate` is scheduled after `delay_minutes`
-5. Before firing a scheduled `escalate` step, alert_router checks `GET /api/v1/alarms/{alarm_id}/gateway-view` (also gateway-authenticated) and skips delivery if the alarm is no longer `ACTIVE`, this is the only way alert_router can learn an operator acknowledged/cleared/suppressed the alarm, since the gateway's local Kafka stream never receives that event back from the Control Plane
+5. Before firing a scheduled `escalate` step, alert_router checks `GET /api/v1/alarms/{alarm_id}/gateway-view` (also gateway-authenticated) and skips delivery if the alarm is no longer `ACTIVE`; this is the only way alert_router can learn an operator acknowledged/cleared/suppressed the alarm, since the gateway's local Kafka stream never receives that event back from the Control Plane
 6. Alarms with no `escalation_policy_id` bound (e.g. resource-pressure alarms, or alarm-rules with no policy configured) fall back to the sink's statically configured webhook/Slack destination, unchanged from before
 
 Implemented, closed remediation ledger item B5. Requires the alert_router
@@ -177,7 +177,7 @@ alarms
 
 ### Negative
 - The `alert_router` sink still delivers to a static webhook; step-based escalation is the one remaining implementation gap from this ADR set (tracked as item B5)
-- DLQ messages and alarms are separate records for the same breach: range/rate/gap validation failures now exist as both a DLQ entry (raw payload, for reprocessing) and an `Alarm` row (for operator visibility/lifecycle), not a single unified record, this is an intentional trade-off (each serves a different workflow), not a gap
+- DLQ messages and alarms are separate records for the same breach: range/rate/gap validation failures now exist as both a DLQ entry (raw payload, for reprocessing) and an `Alarm` row (for operator visibility/lifecycle), not a single unified record; this is an intentional trade-off (each serves a different workflow), not a gap
 
 ## Related Decisions
 - [ADR-004: Validation and DLQ Workflow](ADR-004-validation-dlq.md)

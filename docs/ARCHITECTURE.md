@@ -1,6 +1,6 @@
 # Qorel System Architecture
 
-**Comprehensive architecture documentation for the Industrial Data Platform.**
+**Comprehensive architecture documentation for the Industrial Data Gateway platform.**
 
 ---
 
@@ -222,7 +222,7 @@ Adapter configuration must be protocol-aware. Flat scalar field lists are not en
 
 An adapter instance represents one source connection or session context and may contain many mapped signals inside it. Multi-parameter industrial sources such as PLCs, MQTT payloads, and OPC UA servers should normally be modeled as one adapter with repeatable point/subscription/monitored-item mappings, not as one adapter per parameter.
 
-Adapter and deployment configuration contracts (point mappings, byte-order handling, and repeatable subscriptions) are locked in the private repo's internal spec, not included in this showcase.
+See Adapters And Deployments Spec for the locked operator-facing configuration contract.
 
 #### 3. Local Stream Broker
 - **Deployment**: Embedded Kafka-compatible broker
@@ -403,7 +403,7 @@ For Modbus adapters, contiguous or overlapping holding-register definitions are 
 | `float32` | 2 | IEEE 754 single precision; configurable `word_order`/`byte_order` |
 | `float64` | 4 | IEEE 754 double precision |
 
-Set `word_order: "little"` for Schneider/Modicon devices (CDAB byte order). Default for all types is big-endian ABCD. The full byte-order combination table lives in the private repo's internal spec, not included in this showcase.
+Set `word_order: "little"` for Schneider/Modicon devices (CDAB byte order). Default for all types is big-endian ABCD. See ADAPTERS_AND_DEPLOYMENTS_SPEC.md for the full byte-order combination table.
 
 #### Required Endpoints
 ```
@@ -417,7 +417,7 @@ GET /metrics → Prometheus format
 
 ### Schema Registry Integration
 
-- **Serialization**: Avro is used whenever it's available (schema resolvable + `fastavro` installed), this is the default path, not opt-in. `SCHEMA_STRICT_AVRO=true` only changes what happens when Avro *isn't* available: unset/false silently falls back to JSON; true raises an error instead. JSON is the fallback, not the default.
+- **Serialization**: Avro is used whenever it's available (schema resolvable + `fastavro` installed); this is the default path, not opt-in. `SCHEMA_STRICT_AVRO=true` only changes what happens when Avro *isn't* available: unset/false silently falls back to JSON; true raises an error instead. JSON is the fallback, not the default.
 - **Registry**: Kafka-compatible Schema Registry API. The local dev stack uses Redpanda's built-in Schema Registry endpoint.
 - **Compatibility**: BACKWARD (default)
 
@@ -591,7 +591,7 @@ Each pipeline can specify which resolutions to produce.
 
 Dedicated sink for routing alarms to external systems. The current
 implementation supports one route per sink instance, of type `slack` or
-generic `webhook`, there is no severity-tiered multi-destination table and
+generic `webhook`; there is no severity-tiered multi-destination table and
 no digest/batching behavior:
 
 ```yaml
@@ -906,7 +906,7 @@ Edge:
 Status: planned/deferred. This section captures the intended direction, not a
 production-complete subsystem in the current codebase. AI/copilot work should
 remain behind the production-readiness items tracked in
-the production-readiness tracker in the private repo (not included in this showcase).
+Production Readiness Detail.
 
 ### Tools-First Architecture
 

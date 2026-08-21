@@ -95,7 +95,7 @@ narrower than first proposed.
 
 `step_type: immediate` fires as soon as the alarm is raised; `step_type:
 escalate` fires after `delay_minutes` has elapsed with the alarm still
-unacknowledged. `channel_type` is currently `slack` or `webhook` only,
+unacknowledged. `channel_type` is currently `slack` or `webhook` only, 
 `email` and `pagerduty` from the original proposal are not implemented as
 channel types. `channel_url` is intentionally write-only: it is accepted on
 create/update but never included in read responses, so operators viewing a
@@ -106,7 +106,7 @@ Steps are evaluated in array order.
 
 Step validation has shipped. `EscalationPolicyStepCreate` (Pydantic) enforces
 `step_type` against `^(immediate|escalate)$`, `channel_type` against
-`^(slack|webhook)$`, and requires `name` and `channel_url` to be non-empty,
+`^(slack|webhook)$`, and requires `name` and `channel_url` to be non-empty, 
 invalid step objects are rejected at the API layer with a 422, not persisted
 silently. The originally-planned "Phase 3 Wave 4" caveat no longer applies.
 

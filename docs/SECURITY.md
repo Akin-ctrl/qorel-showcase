@@ -108,7 +108,7 @@ Response:
 **Current shipped method**: admin-created enrollment tokens let a gateway enroll
 as `pending`; an operator approves it, then the control plane issues a
 long-lived gateway JWT for config polling, heartbeat, and gateway-side actions.
-Possession of the `gateway_id` alone is no longer sufficient to mint a token,
+Possession of the `gateway_id` alone is no longer sufficient to mint a token, 
 every `/token` and `/token/renew` request must additionally prove possession
 of the gateway's private key (see "Device-identity keypair" below).
 
@@ -231,7 +231,7 @@ curl -X POST https://api.qorel.example.com/api/v1/gateways/register \
 ```
 
 This full mTLS/PKI-issued-certificate model remains a *further* future step
-beyond the Ed25519 TOFU keypair already shipped above, it adds a trusted CA
+beyond the Ed25519 TOFU keypair already shipped above; it adds a trusted CA
 vouching for device identity, rather than trust-on-first-enroll.
 
 #### Ongoing authentication
@@ -272,10 +272,11 @@ sasl.mechanism.inter.broker.protocol=SCRAM-SHA-512
 sasl.enabled.mechanisms=SCRAM-SHA-512
 ```
 
-**Planned adapter credentials**, ⚠️ **not implemented.** `${secret:...}` is a
-proposed reference syntax; the gateway runtime does not resolve it today, and a
-config containing it will be passed through to the adapter verbatim. Shown to
-record the intended design, not as a usable example.
+**Planned adapter credentials.** Not implemented. The Kafka sink does not
+support SASL today. When it is built, credentials will be ordinary catalog
+fields marked `secret: true`, entered in the operator UI and Fernet-encrypted
+at rest like every other secret field. Qorel has no config-interpolation
+syntax, and none is committed to here.
 
 ```json
 {
@@ -283,8 +284,8 @@ record the intended design, not as a usable example.
     "kafka_bootstrap": "kafka.example.com:9093",
     "security_protocol": "SASL_SSL",
     "sasl_mechanism": "SCRAM-SHA-512",
-    "sasl_username": "${secret:kafka_adapter_user}   <- NOT RESOLVED TODAY",
-    "sasl_password": "${secret:kafka_adapter_password} <- NOT RESOLVED TODAY"
+    "sasl_username": "adapter-user",
+    "sasl_password": "<secret field, stored encrypted, never returned by GET>"
   }
 }
 ```
@@ -617,41 +618,25 @@ Secret fields in adapter and sink configs are handled safely by the control plan
 
 ### Production Hardening (Not Yet Implemented)
 
-The following secret resolution paths are **planned for production hardening but are not wired in the current codebase**. Do not document these as shipped behavior.
+#### External secret managers
 
-#### HashiCorp Vault Integration
+Qorel does not integrate with an external secret manager. There is no Vault
+integration, no `hvac` dependency, and no interpolation syntax that resolves
+secret references inside adapter or sink configs. Secrets are held by the
+control plane and Fernet-encrypted at rest, as described above.
 
-`${vault:path#key}` interpolation in adapter/sink configs is the intended production secret reference syntax. The gateway runtime does not currently resolve these references. No `hvac`-based secret resolver exists in the gateway runtime today.
+Integrating an external secret manager is a plausible direction for
+higher-assurance deployments. No syntax or architecture is committed to here,
+and none should be assumed or designed against.
 
-Intended architecture (not yet implemented):
-```
-Gateway Runtime → Vault Agent → HashiCorp Vault
-  ↓ (inject resolved secrets)
-Adapter / sink config
-```
+#### Orchestrator secrets
 
-When this is implemented, adapter configs would reference secrets as follows.
-⚠️ **Copying this into a real config today will not work**, the placeholder is
-stored and forwarded literally, not resolved:
-
-```json
-{
-  "username": "${vault:secret/qorel/opcua/plc-01#username}   <- NOT RESOLVED TODAY",
-  "password": "${vault:secret/qorel/opcua/plc-01#password} <- NOT RESOLVED TODAY"
-}
-```
-
-#### Orchestrator Secrets
-
-Production packaging is still pending. The intended direction is that packaged deployments inject sensitive values through the deployment environment (K8s Secrets, Docker secrets), while Qorel configs reference placeholders rather than embedding values directly.
-
-### Future: Orchestrator Secrets
-
-Production packaging is still pending, so Qorel does not yet document a
-supported orchestrator-secret manifest. The intended direction is simple:
-packaged deployments should inject sensitive values through the deployment
-environment, while Qorel configs should reference secrets rather than
-carry plaintext credentials.
+Production Compose packaging ships. Platform-level secrets
+(`QOREL_JWT_SECRET`, `QOREL_CONFIG_SECRET_KEY`, `POSTGRES_PASSWORD`) are
+injected as environment variables from a deployment-managed `.env` file; see
+`deploy/prod/.env.control-plane.example` and `deploy/prod/.env.edge.example`.
+Kubernetes manifests and image-pull-secret templates remain open, so no
+Kubernetes Secret layout is documented yet.
 
 ---
 
@@ -718,7 +703,7 @@ exists today: a relational row per event, queryable and indexed.
 An earlier version of this document additionally described a second,
 append-only write to a Kafka topic (`audit_trail`, infinite retention, 3x
 replication) as a "dual storage" durability layer. **That write was never
-implemented**, there is no Kafka producer anywhere in the audit path. It
+implemented**; there is no Kafka producer anywhere in the audit path. It
 has been removed from this document rather than left as an unbuilt
 durability claim. If tamper-evident, append-only audit storage becomes a
 genuine requirement (e.g. for a specific compliance certification), it
@@ -773,7 +758,7 @@ WHERE failed_login_attempts > 5;
 | **Insider threat (malicious admin)** | Data deletion, config destruction | Audit logs, approval workflows, immutable backups |
 | **Physical access to edge gateway** | Device tampering | Disk encryption, tamper-evident seals, secure boot |
 
-**Production Hardening (Not Yet Implemented):** API rate limiting and an IP allowlist for the Control API are not wired into the current codebase, there is no rate-limiting middleware or IP-allowlist check anywhere in `control-plane/app`. Do not document these as shipped behavior until they exist.
+**Production Hardening (Not Yet Implemented):** API rate limiting and an IP allowlist for the Control API are not wired into the current codebase; there is no rate-limiting middleware or IP-allowlist check anywhere in `control-plane/app`. Do not document these as shipped behavior until they exist.
 
 ### Attack Scenarios
 
@@ -953,4 +938,4 @@ Vendor Support: support@qorel.io
 **End of Security Documentation**
 
 For architecture details, see [ARCHITECTURE.md](ARCHITECTURE.md).
-For deployment, see the deployment guide (not included in this showcase).
+For deployment, see DEPLOYMENT.md.

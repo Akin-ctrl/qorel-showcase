@@ -33,9 +33,9 @@ Status interpretation note:
 
 ### Open Work Anchors
 
-- Remaining open implementation items are now narrower and are tracked in P2/P3 checkboxes below plus the project's internal roadmap tracker (Cross-Cutting Open Issues, Production Readiness, and UI Product Action List sections).
+- Remaining open implementation items are now narrower and are tracked in P2/P3 checkboxes below plus `PROJECT_PHASES.md` (Cross-Cutting Open Issues, Production Readiness, and UI Product Action List sections).
 - ADR-001 has been amended: the original Apache Kafka/KRaft implementation has moved to a Redpanda-first Kafka-compatible local dev/runtime broker path, while production packaging and image-pull templates remain pending.
-- Completed issue items are moved to the internal roadmap tracker's resolved-issues ledger (not included in this showcase).
+- Completed issue items are moved to PROJECT_PHASES.md.
 
 ---
 
@@ -106,14 +106,14 @@ Status interpretation note:
 ### Phase 5: Alerting, Escalation & Alarm Lifecycle (ADR-012 / ADR-013 / ADR-014)
 
 This phase was introduced by ADR-012/013/014 (accepted 2026-06-30), after this
-baseline's original adoption date. It was not previously tracked here, that
+baseline's original adoption date. It was not previously tracked here; that
 omission is itself corrected by this section as of 2026-07-08.
 
 #### Followed
 - `alerting_rules` and `escalation_policies` tables exist with full CRUD APIs, audited via `record_audit_event()`.
 - The `escalation_policy_id` FK (ADR-013) and PolicyStep validation are both implemented, ADR-013's "planned, not yet applied" language has been corrected to reflect this.
 - The four-state alarm lifecycle (ACTIVE/ACKNOWLEDGED/SUPPRESSED/CLEARED) is implemented with proper transition guards, exceeding the ADR's own diagram.
-- Alerting rules bound to a deployment are evaluated in-process by the gateway validator via the existing cached-config hot-reload path (see ADR-012 amendment), this closes ADR-012's original "evaluation deferred" gap without a separate stream-processing component.
+- Alerting rules bound to a deployment are evaluated in-process by the gateway validator via the existing cached-config hot-reload path (see ADR-012 amendment); this closes ADR-012's original "evaluation deferred" gap without a separate stream-processing component.
 - Resource-pressure alarms (gateway heartbeat CPU/memory >90%) are implemented.
 - Range, rate-of-change, and gap-detection validation breaches now also raise `Alarm` rows (`alarm_type`: `range_exceeded`/`rate_of_change`/`gap_detected`) alongside the existing DLQ entry, closed remediation ledger item B6.
 - The `alert_router` sink now resolves an alarm's bound escalation policy (gateway-authenticated `GET /api/v1/escalation-policies/{policy_id}/resolve`) and walks its steps, checking current alarm state before firing delayed `escalate` steps (`GET /api/v1/alarms/{alarm_id}/gateway-view`), closed remediation ledger item B5. Falls back to the static webhook when no policy is bound.
@@ -194,7 +194,7 @@ Amended direction as of 2026-05-30:
 
 The following open implementation-level gaps remain attached to this baseline for remediation tracking:
 
-The hardening issues originally tracked here are now resolved and have been moved to the internal roadmap tracker's resolved-issues ledger (not included in this showcase).
+The hardening issues originally tracked here are now resolved and have been moved to PROJECT_PHASES.md.
 
 ---
 
@@ -215,7 +215,7 @@ The checklist below converts the findings in this ADR into a practical fix seque
 - [x] Reconcile architecture docs describing local-vs-central Kafka-compatible broker ownership to eliminate conflicting platform direction.
 - [x] Complete the Redpanda migration across dev compose, runtime broker management, deployment docs, and tests while retaining Kafka-compatible client semantics.
 - [x] Ship a production compose packaging path for the Redpanda-backed runtime (split 2026-07-10 into `deploy/prod/docker-compose.control-plane.yml` + `docker-compose.edge.yml` for a two-host deployment: pinned Redpanda image, TLS-terminating nginx, network isolation, versioned `qorel/*` images) plus a `Makefile` build/push/cross-build flow and a Production Deployment section in `docs/DEPLOYMENT.md`.
-- [ ] Complete registry-publishing and image-pull-secret templates for orchestrators beyond compose (e.g. Kubernetes), this is the only piece of the original packaging item still open.
+- [ ] Complete registry-publishing and image-pull-secret templates for orchestrators beyond compose (e.g. Kubernetes); this is the only piece of the original packaging item still open.
 
 ### P2: Runtime Reliability and Contract Enforcement
 
