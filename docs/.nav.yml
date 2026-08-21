@@ -1,0 +1,11 @@
+# Page order for the site. Lives here rather than in per-page front matter,
+# because the docs sync overwrites every .md file under docs/ verbatim.
+nav:
+  - index.md
+  - Product tour: product-tour.md
+  - Architecture:
+      - QOREL_TECHNICAL_OVERVIEW.md
+      - ARCHITECTURE.md
+      - DATA_FLOW.md
+      - SECURITY.md
+  - Decisions: adr

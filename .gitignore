@@ -1,0 +1,4 @@
+# Built by the docs workflow, never committed.
+site/
+# Staged into the site at build time from the repo-root screenshots/ folder.
+docs/screenshots/
