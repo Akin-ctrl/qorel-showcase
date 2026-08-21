@@ -46,6 +46,14 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+      # GitHub-compatible heading slugs. Python-Markdown's default collapses
+      # repeated separators, so "Data Quality & Validation" becomes
+      # "data-quality-validation", while GitHub produces
+      # "data-quality--validation". The docs are authored in the private repo
+      # and read on GitHub too, so the links are correct as written and it is
+      # the slugifier that must match, not the links that must change.
+      slugify: !!python/object/apply:pymdownx.slugs.slugify {kwds: {case: lower}}
+      separator: "-"
   - pymdownx.highlight
   - pymdownx.superfences
   - pymdownx.details
