@@ -1,0 +1,56 @@
+# Qorel documentation site.
+#
+# Deliberately configured so that NOTHING the docs sync writes needs editing.
+# The private Qorel repo is the source of truth for everything under docs/, and
+# its sync workflow overwrites those files verbatim. So this config lives at the
+# repo root, and page ordering lives in .nav.yml files, never in per-page front
+# matter, which a sync would wipe.
+
+site_name: Qorel
+site_description: Streaming data platform for industrial plants. Edge-resident, outage-tolerant, replayable, AI-ready.
+site_url: https://akin-ctrl.github.io/qorel-showcase/
+repo_url: https://github.com/Akin-ctrl/qorel-showcase
+repo_name: Akin-ctrl/qorel-showcase
+copyright: Copyright &copy; 2026 Akingbade Emmanuel Adebowale. All rights reserved.
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.instant
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue grey
+      accent: indigo
+      toggle: { icon: material/weather-night, name: Switch to dark mode }
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue grey
+      accent: indigo
+      toggle: { icon: material/weather-sunny, name: Switch to light mode }
+
+plugins:
+  - search
+  - awesome-nav
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.details
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Akin-ctrl/qorel-showcase

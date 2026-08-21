@@ -1,0 +1,60 @@
+name: Docs site
+
+# Builds the MkDocs site and publishes it to GitHub Pages.
+#
+# The docs themselves are NOT edited here. They are synced verbatim from the
+# private Qorel repo by its sync workflow, which is why all site configuration
+# lives outside docs/ (mkdocs.yml at the root) or in .nav.yml files that the
+# sync never writes. Never add front matter to a synced page; it will be lost.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; queue instead of cancelling a half-finished one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+
+      - run: pip install -r requirements-docs.txt
+
+      - name: Stage screenshots into the site
+        # They live at repo root so the sync's allowlist never touches them.
+        # MkDocs only serves docs_dir, so copy them in at build time.
+        run: |
+          mkdir -p docs/screenshots
+          cp screenshots/*.jpeg docs/screenshots/
+
+      - run: mkdocs build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

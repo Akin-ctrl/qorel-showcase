@@ -1,0 +1,4 @@
+# The glob means a new ADR appears in the navigation with no config change.
+nav:
+  - README.md
+  - "ADR-*.md"
