@@ -43,11 +43,36 @@ jobs:
           mkdir -p docs/screenshots
           cp screenshots/*.jpeg docs/screenshots/
 
-      - run: mkdocs build
+      # --strict turns broken internal links and bad anchors into build
+      # failures, so a doc sync that breaks a cross-reference is caught here
+      # rather than shipped to the site.
+      - run: mkdocs build --strict
 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
+
+  # External links are checked separately from the build: a dead third-party
+  # URL should be visible, but it should not block publishing the docs.
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check external links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --exclude-path screenshots
+            --exclude '^https://akin-ctrl\.github\.io'
+            --exclude '^https://github\.com/Akin-ctrl/Qorel'
+            --accept 200,206,429
+            './**/*.md'
+          fail: false
+          output: lychee-report.md
+      - name: Publish the report to the run summary
+        if: always()
+        run: cat lychee-report.md >> "$GITHUB_STEP_SUMMARY" || true
 
   deploy:
     needs: build
