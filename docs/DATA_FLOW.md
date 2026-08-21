@@ -142,7 +142,7 @@ Adapter container: Reads configured register batch
 
 **Time: 12:01:04.001 - Normalization**
 
-One telemetry message batches every reading from the same poll cycle,
+One telemetry message batches every reading from the same poll cycle, 
 the adapter does not publish one message per parameter (see
 `adapters/adapter_base/telemetry.avsc` and `modbus_tcp_adapter.py`'s
 `transform()`):
@@ -517,7 +517,7 @@ Topics buffered:
   - alarms.raw: 1,200 messages
 
 Note: recent gateway-runtime logs are transported to the control plane via
-the heartbeat payload, not a Kafka topic, there is no logs.* topic to
+the heartbeat payload, not a Kafka topic; there is no logs.* topic to
 buffer. Log visibility during an outage is limited to whatever the
 gateway's local recent-log ring buffer still holds when connectivity
 returns.
@@ -630,7 +630,7 @@ escalating an alarm an operator already acknowledged).
 Note: escalation-policy step-walking (an escalate step scheduled after
 delay_minutes, checked against current alarm state before firing) is
 implemented (ADR-013/ADR-014, sink_alert_router). External incident-status
-synchronization (e.g. auto-resolving a PagerDuty incident) is not, there
+synchronization (e.g. auto-resolving a PagerDuty incident) is not; there
 is no PagerDuty channel type at all yet, only slack and webhook.
 ```
 
@@ -665,7 +665,7 @@ the ACTIVE record):
 }
 
 Note: this CLEARED record was published from the gateway's own local
-validator state, not mirrored from the operator's ACK in the step above,
+validator state, not mirrored from the operator's ACK in the step above, 
 the gateway and control plane track alarm lifecycle independently and can
 disagree about acked_at/acked_by until the gateway next polls
 gateway-view. `duration_seconds` is not on this wire message at all; the
@@ -699,7 +699,7 @@ INSERT INTO alarms (
 ### Telemetry Message (Complete)
 
 This is the real Avro wire shape (`adapters/adapter_base/telemetry.avsc`).
-One message batches every reading from a single poll cycle, there is no
+One message batches every reading from a single poll cycle; there is no
 per-parameter message, no `clock_skew_ms`, and no `schema_version` field on
 the envelope (schema evolution is handled by the Schema Registry, not a
 field in the payload). `topology` is an optional ISA-95 hierarchy reference,
@@ -742,7 +742,7 @@ manual intervention (`mode: "manual_decode_required"`).
 
 ### Event Message (State Change)
 
-Matches `schemas/event.avsc`. The metadata field is `deployment_id`, it was
+Matches `schemas/event.avsc`. The metadata field is `deployment_id`; it was
 originally named `pipeline_id` from before the platform's UI/API terminology
 moved from "pipeline" to "deployment"; the schema and every producer were
 renamed to match. `event_validator.py` still accepts an incoming `pipeline_id`
@@ -775,7 +775,7 @@ during a rolling upgrade, but no current producer emits it.
 
 ### Alarm Message (All States)
 
-Matches `schemas/alarm.avsc`. Avro records are not partial/patch documents,
+Matches `schemas/alarm.avsc`. Avro records are not partial/patch documents, 
 every state transition (raise, acknowledge, clear) publishes a **complete**
 alarm record with every field present (nulled where not applicable), not a
 delta containing only the changed keys. There is no `duration_seconds` or
@@ -866,7 +866,7 @@ computed and stored by the control plane when it persists the row
 
 ### Log Entry (Recent Runtime Logs)
 
-This is **not** a Kafka message, there is no `logs.*` topic. Gateway
+This is **not** a Kafka message; there is no `logs.*` topic. Gateway
 runtime logs are captured in a bounded in-memory ring buffer
 (`gateway_runtime/logging_utils.py`, `RecentLogBufferHandler`) and the most
 recent entries are transported to the control plane inside the gateway's
@@ -887,7 +887,7 @@ event message and has no `classification`, `log_level`, or `details` field:
 
 `exception` is added only when the log record carries exception info
 (a formatted traceback string). There is no dedicated field for structured
-details like host/port/retry count, that context has to be in the free-text
+details like host/port/retry count; that context has to be in the free-text
 `message` itself.
 
 ### Aggregated Telemetry (1-minute window)
@@ -939,4 +939,4 @@ aggregator actually consumes), not `telemetry.raw`.
 **End of Data Flow Documentation**
 
 For architecture details, see [ARCHITECTURE.md](ARCHITECTURE.md).
-For deployment, see the deployment guide (not included in this showcase).
+For deployment, see DEPLOYMENT.md.

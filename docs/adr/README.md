@@ -28,7 +28,6 @@ An ADR documents a significant architectural decision, including:
 | [ADR-012](ADR-012-alerting-rules.md) | Alerting Rules Storage and Evaluation | Accepted, amended |
 | [ADR-013](ADR-013-escalation-policies.md) | Escalation Policy Structure and Rule Binding | Accepted, corrected |
 | [ADR-014](ADR-014-alarm-lifecycle.md) | Alarm Lifecycle | Accepted, corrected |
-| [ADR-015](ADR-015-historian-and-intelligence-placement.md) | Historian Placement and Intelligence Locality | Accepted |
 
 ## Key Decisions Summary
 
@@ -37,7 +36,6 @@ An ADR documents a significant architectural decision, including:
 - **Serialization**: Avro with Schema Registry
 - **Adapters & Sinks**: Docker containers with standard contract
 - **Overflow**: Tiered strategy (compress → downsample → evict by priority)
-- **Historian & Intelligence**: bundled edge historian is a first-class Qorel component distinct from sinks; the control plane stores operational data and never telemetry; site intelligence computes at the edge and fleet intelligence composes edge-computed findings (ADR-015)
 
 ### Architecture
 - **Gateway Autonomy**: Full offline capability after first boot
@@ -52,7 +50,7 @@ An ADR documents a significant architectural decision, including:
 
 Current implementation progress and issue movement are tracked in:
 - [ADR-011](ADR-011-phase-1-4-conformance-baseline.md) for open conformance gaps and active checklist items.
-- A resolved-issues ledger in the private repo's project tracker, for items moved out of active queues after completion (not included in this showcase).
+- Resolved Issues Ledger for items moved out of active queues after completion.
 
 ## Creating New ADRs
 

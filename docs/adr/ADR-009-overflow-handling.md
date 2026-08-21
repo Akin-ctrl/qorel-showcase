@@ -77,7 +77,7 @@ We needed a strategy for handling disk exhaustion.
 
 **Key rule**: Alarms are NEVER evicted. If disk is 95% full and only alarms remain, block producers.
 
-**Clarification (2026-07-08)**: "Never evicted" describes exemption from the tiered *disk-pressure* eviction above, it is not a promise of unbounded retention. `dlq.*` topics separately carry a fixed 7-day `retention.ms` (ADR-004 Mitigations), applied independently of disk usage, so a sustained bad-data loop still has a ceiling even though disk-pressure eviction will never be the thing that trims it. `alarms.*` has no such backstop today; alarm volume is expected to stay low enough that this hasn't been needed.
+**Clarification (2026-07-08)**: "Never evicted" describes exemption from the tiered *disk-pressure* eviction above; it is not a promise of unbounded retention. `dlq.*` topics separately carry a fixed 7-day `retention.ms` (ADR-004 Mitigations), applied independently of disk usage, so a sustained bad-data loop still has a ceiling even though disk-pressure eviction will never be the thing that trims it. `alarms.*` has no such backstop today; alarm volume is expected to stay low enough that this hasn't been needed.
 
 ## Implementation
 
@@ -138,7 +138,7 @@ precise before/after knowledge this mechanism doesn't have:
   reclaimed" reading, not a placeholder; only unreadable disk stats produce
   `null`.
 - `newest_evicted`: the retention cutoff just applied (`now - retention_ms`)
- , the most recent timestamp any evicted message could have had.
+, the most recent timestamp any evicted message could have had.
 - `oldest_evicted`: left `null`. The true oldest evicted timestamp isn't
   knowable without reading broker segment-file metadata directly, which
   this mechanism doesn't do, reporting a guessed value would be worse than

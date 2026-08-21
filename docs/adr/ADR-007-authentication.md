@@ -2,9 +2,7 @@
 
 **Status**: Accepted  
 **Date**: 2026-01-29 (amended 2026-07-09: gateway JWT now requires Ed25519
-proof-of-possession, not `gateway_id` alone, see Option D; amended 2026-07-27:
-gateway identity revocation model added, not yet implemented, see Gateway
-Identity Revocation)  
+proof-of-possession, not `gateway_id` alone, see Option D)  
 **Decision**: enrollment-gated JWT for gateways, bound to an Ed25519
 device-identity keypair; built-in users today with account lockout and
 server-side logout invalidation; optional OAuth/OIDC later
@@ -53,7 +51,7 @@ Each has different requirements for credential lifecycle and management.
   public key, with a clock-skew window and single-last-nonce reuse check.
 
 **Pros**: Closes the actual gap in Option C as shipped (a JWT was mintable by
-anyone who merely *knew* an approved `gateway_id`, which is not a secret,
+anyone who merely *knew* an approved `gateway_id`, which is not a secret, 
 it's visible in the UI, audit logs, and hostnames); no shared secret to leak
 or rotate; no PKI/CA operational weight.  
 **Cons**: TOFU, not CA-backed, a compromised enrollment token used before
@@ -103,7 +101,7 @@ different key is rejected with `409` rather than silently re-keying).
 3. **Revocable**: Control Plane can invalidate tokens immediately
 4. **Claims**: Token contains gateway ID, permissions, tenant (future)
 5. **Bound to device identity**: knowledge of `gateway_id` alone was never
-   meant to be sufficient, it isn't a secret. Requiring an Ed25519 signature
+   meant to be sufficient; it isn't a secret. Requiring an Ed25519 signature
    closes that gap without full mTLS/PKI operational weight.
 
 ### User Auth
@@ -208,65 +206,5 @@ are reasonable; this ADR documents the cadence that is actually running.
 - Document secure token storage
 - Clear separation between auth paths in code
 
-## Gateway Identity Revocation
-
-*Added 2026-07-27 (PRE_AI_ROADMAP item G4a). Not yet implemented, Stage 1.*
-
-### Gap
-
-There is no revocation primitive. `Gateway` has no `token_valid_after`
-watermark, that exists only on `User`, so a JWT already issued to a gateway
-stays valid until natural expiry with no way to cut it short. The only available
-action is `DELETE /gateways/{gateway_id}`, a hard `db.delete(gateway)`, which
-destroys the row *and* the TOFU public-key binding. The same device can then
-re-enroll with the same site token and a fresh keypair.
-
-Deletion is not revocation. It is amnesia. This is the gap an IEC 62443 review
-raises first, and it undermines the site-token-only decision recorded in
-PRE_AI_ROADMAP G4, site tokens are acceptable *because* TOFU binds the first
-key, and hard delete throws that binding away.
-
-### Decision
-
-Three distinct operations rather than one overloaded flag:
-
-| Operation | Effect | Risk |
-|---|---|---|
-| **Revoke** | Invalidate live tokens via `token_valid_after`; refuse new token issue/renew; refuse re-enrollment of the `gateway_id`. Row, audit history, and **public-key binding all preserved**. | Low, reversible |
-| **Un-revoke** | Device resumes normal operation. | Low **by construction**, see below |
-| **Re-key** | Clear `public_key` so a fresh TOFU bind may occur. For a compromised key or replaced hardware. | **High**, separate permission, loud audit event |
-
-**Retaining the key binding on revoke is what makes reversibility safe.** Only
-hardware still holding the matching private key can resume after an un-revoke.
-Someone who merely knows the `gateway_id`, visible in the UI, audit logs, and
-hostnames, gains nothing, because they cannot sign the proof-of-possession that
-`/token` and `/token/renew` require.
-
-Reversibility therefore adds no meaningful attack surface beyond what the
-`gateways:manage` permission already grants, since that permission can approve
-new gateways regardless.
-
-**Re-key is deliberately separate from un-revoke.** Bundling them would mean
-every routine un-revoke silently reopens the key-binding window, turning the
-common, low-risk operation into the rare, high-risk one.
-
-### `DELETE` semantics
-
-`DELETE /gateways/{gateway_id}` is narrowed:
-
-- **Never approved** → deletes as today. This is abandoned-enrollment cleanup and
-  loses nothing of value.
-- **Ever approved** → `409`, directing the operator to revoke instead.
-
-Retirement becomes `revoke(reason="decommissioned")`. Anything that ever carried
-real data keeps its audit trail and its key binding.
-
-### Fields
-
-`Gateway` gains `revoked_at`, `revoked_by`, `revoked_reason`, and
-`token_valid_after`. Folded into the `0001_init.py` baseline per the pre-ship
-squash rule.
-
 ## Related Decisions
 - [ADR-006: Gateway Autonomy](ADR-006-gateway-autonomy.md)
-- [ADR-015: Historian Placement and Intelligence Locality](ADR-015-historian-and-intelligence-placement.md)

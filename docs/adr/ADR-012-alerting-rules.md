@@ -76,7 +76,7 @@ the dedicated stream-processing component Option B itself called "overkill
 for the current deployment scale." **The dedicated stream evaluator
 described in Option B is no longer planned.** If a future scale point
 genuinely requires independent evaluation-engine scaling, that would need
-its own ADR revisiting this decision, it is not presently on the roadmap.
+its own ADR revisiting this decision; it is not presently on the roadmap.
 
 ## Rationale
 
@@ -124,7 +124,7 @@ one deployment (this is how it reaches the gateway).
 
 ## Relationship to Deployment Validation Rules
 
-Deployment validation rules (range, rate-of-change, gap-detection,
+Deployment validation rules (range, rate-of-change, gap-detection, 
 configured per-deployment in `DeploymentCreatePage`) and alerting rules (this
 ADR) are both evaluated **inside the gateway runtime**, in-process, per the
 Amendment above. They remain distinct rule lists with different trigger
